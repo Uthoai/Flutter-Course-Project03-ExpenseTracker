@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
@@ -9,7 +8,7 @@ const uuid = Uuid();
 
 enum Category {rent, food, transport, entertainment, education, shopping, work, income, other}
 
-const CategoryIcons = {
+const categoryIcons = {
   Category.rent: Icons.home,
   Category.food: Icons.lunch_dining,
   Category.transport: Icons.car_crash,

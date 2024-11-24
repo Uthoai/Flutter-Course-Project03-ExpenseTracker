@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_course_project03_expense_tracker/model/expense.dart';
 
 class NewExpense extends StatefulWidget {
   const NewExpense({super.key});
@@ -12,16 +13,21 @@ class NewExpense extends StatefulWidget {
 class _NewExpense extends State<NewExpense> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
+  DateTime? selectedDate;
+  Category _selectedCategory = Category.rent;
 
-  void _presentDatePicker(){
+  void _presentDatePicker() async {
     final dateNow = DateTime.now();
-    final firstDate = DateTime(dateNow.year -1, dateNow.month, dateNow.day);
-    showDatePicker(
+    final firstDate = DateTime(dateNow.year - 1, dateNow.month, dateNow.day);
+    final pickedDate = await showDatePicker(
         context: context,
         initialDate: dateNow,
         firstDate: firstDate,
-        lastDate: dateNow
-    );
+        lastDate: dateNow);
+
+    setState(() {
+      selectedDate = pickedDate;
+    });
   }
 
   @override
@@ -36,7 +42,9 @@ class _NewExpense extends State<NewExpense> {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // title
           TextField(
             controller: _titleController,
             maxLength: 30,
@@ -47,6 +55,7 @@ class _NewExpense extends State<NewExpense> {
             decoration: const InputDecoration(
                 label: Text("Title", style: TextStyle(color: Colors.blue))),
           ),
+          //amount , date picker
           Row(
             children: [
               Expanded(
@@ -62,15 +71,16 @@ class _NewExpense extends State<NewExpense> {
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 8),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    const Text(
-                        "Selected Date",
-                        style: TextStyle(color: Colors.blue)
-                    ),
+                    Text(
+                        selectedDate == null
+                            ? "Select Date"
+                            : formatter.format(selectedDate!),
+                        style: const TextStyle(color: Colors.blue)),
                     IconButton(
                         onPressed: () {
                           _presentDatePicker();
@@ -78,13 +88,29 @@ class _NewExpense extends State<NewExpense> {
                         icon: const Icon(
                           Icons.calendar_month,
                           color: Colors.blue,
-                        )
-                    )
+                        ))
                   ],
                 ),
               )
             ],
           ),
+          const SizedBox(height: 4.0),
+          DropdownButton(
+              value: _selectedCategory,
+              items: Category.values
+                  .map((category) => DropdownMenuItem(
+                        value: category,
+                        child: Text(category.name.toUpperCase()),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                if (value == null) {
+                  return;
+                }
+                setState(() {
+                  _selectedCategory = value;
+                });
+              }),
           const SizedBox(height: 8.0),
           //Button Row
           Row(
@@ -106,13 +132,11 @@ class _NewExpense extends State<NewExpense> {
               ),
               const Spacer(),
               TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text(
-                      "Cancel",
-                      style: TextStyle(color: Colors.blue)
-                  ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child:
+                    const Text("Cancel", style: TextStyle(color: Colors.blue)),
               ),
             ],
           )
