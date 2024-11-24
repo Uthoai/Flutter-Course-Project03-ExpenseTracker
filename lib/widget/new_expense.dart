@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_course_project03_expense_tracker/model/expense.dart';
 
 class NewExpense extends StatefulWidget {
-  const NewExpense({super.key});
+  const NewExpense({super.key, required this.onAddExpense});
+
+  final void Function(Expense expense) onAddExpense;
 
   @override
   State<StatefulWidget> createState() {
@@ -13,7 +15,7 @@ class NewExpense extends StatefulWidget {
 class _NewExpense extends State<NewExpense> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
-  DateTime? selectedDate;
+  DateTime? _selectedDate;
   Category _selectedCategory = Category.rent;
 
   void _presentDatePicker() async {
@@ -26,7 +28,7 @@ class _NewExpense extends State<NewExpense> {
         lastDate: dateNow);
 
     setState(() {
-      selectedDate = pickedDate;
+      _selectedDate = pickedDate;
     });
   }
 
@@ -35,6 +37,37 @@ class _NewExpense extends State<NewExpense> {
     _titleController.dispose();
     _amountController.dispose();
     super.dispose();
+  }
+
+  void _saveExpense() {
+    final enteredAmount = double.tryParse(_amountController.text);
+    var amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
+
+    if (_titleController.text.trim().isEmpty ||
+        amountIsInvalid ||
+        _selectedDate == null) {
+      showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+                title: const Text("Invalid Input"),
+                content: const Text(
+                    "Please make sure a valid title, amount, data and category was entered.."),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                      },
+                      child: const Text("Okay"))
+                ],
+              ));
+      return;
+    } else {
+      widget.onAddExpense(Expense(
+          title: _titleController.text,
+          amount: enteredAmount,
+          date: _selectedDate!,
+          category: _selectedCategory));
+    }
   }
 
   @override
@@ -77,9 +110,9 @@ class _NewExpense extends State<NewExpense> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                        selectedDate == null
+                        _selectedDate == null
                             ? "Select Date"
-                            : formatter.format(selectedDate!),
+                            : formatter.format(_selectedDate!),
                         style: const TextStyle(color: Colors.blue)),
                     IconButton(
                         onPressed: () {
@@ -95,6 +128,7 @@ class _NewExpense extends State<NewExpense> {
             ],
           ),
           const SizedBox(height: 4.0),
+          //category select btn
           DropdownButton(
               value: _selectedCategory,
               items: Category.values
@@ -117,9 +151,7 @@ class _NewExpense extends State<NewExpense> {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  print(_titleController.text);
-                  print(_amountController.text);
-                  //Navigator.pop(context);
+                  _saveExpense();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
