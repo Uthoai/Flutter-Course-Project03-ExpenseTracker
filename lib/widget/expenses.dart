@@ -23,51 +23,53 @@ class _ExpensesState extends State<Expenses> {
         title: 'Egg 12pis',
         amount: 150.00,
         date: DateTime.now(),
-        category: Category.food),
-    Expense(
-        title: 'House Rent',
-        amount: 4150.00,
-        date: DateTime.now(),
-        category: Category.rent)
+        category: Category.food)
   ];
 
-  void _openAddExpensesOverlay(){
+  void _openAddExpensesOverlay() {
     showModalBottomSheet(
-        context: context, 
-        builder: (ctx)=> NewExpense(onAddExpense: _addExpense),
-    );
+        context: context,
+        builder: (ctx) => NewExpense(onAddExpense: _addExpense),
+        isScrollControlled: true
+    ); 
   }
 
-  void _addExpense(Expense expense){
+  void _addExpense(Expense expense) {
     setState(() {
       _registerExpenses.add(expense);
+    });
+  }
+
+  void removeExpense(Expense expense){
+    setState(() {
+      _registerExpenses.remove(expense);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Expense Tracker",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w500
+        appBar: AppBar(
+          title: const Text(
+            "Expense Tracker",
+            style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500
+            ),
           ),
+          backgroundColor: Colors.blue,
+          actions: [
+            IconButton(
+                onPressed: _openAddExpensesOverlay,
+                icon: const Icon(Icons.add, color: Colors.white)
+            ),
+          ],
         ),
-        backgroundColor: Colors.blue,
-        actions: [
-          IconButton(
-              onPressed: _openAddExpensesOverlay,
-              icon: const Icon(Icons.add, color: Colors.white)
-          ),
-        ],
-      ),
         body: Column(
-      children: [
-        Text("The Chart"),
-        Expanded(child: ExpensesList(expense: _registerExpenses))
-      ],
-    ));
+          children: [
+            Text("The Chart"),
+            Expanded(child: ExpensesList(expense: _registerExpenses,onRemoveExpense: removeExpense,))
+          ],
+        ));
   }
 }

@@ -68,12 +68,13 @@ class _NewExpense extends State<NewExpense> {
           date: _selectedDate!,
           category: _selectedCategory));
     }
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -88,7 +89,7 @@ class _NewExpense extends State<NewExpense> {
             decoration: const InputDecoration(
                 label: Text("Title", style: TextStyle(color: Colors.blue))),
           ),
-          //amount , date picker
+          //amount, date picker
           Row(
             children: [
               Expanded(
